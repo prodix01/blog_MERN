@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const gravatar = require("gravatar");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 
 const userModel = require("../models/users");
@@ -38,9 +39,24 @@ router.post("/login", (req, res) => {
                             });
                         }
                         else {
-                            res.status(200).json({
-                                msg : "successful login(토큰 반환)"
-                            });
+                            //토큰에 들어갈 유저정
+                            const payload = {
+                                id : user.id,
+                                name : user.name,
+                                avatar : user.avatar
+                            };
+                            // sign token
+                            jwt.sign(
+                                payload,
+                                process.env.JWT_SECRET,
+                                { expiresIn : 36000 }, //만료시간
+                                (err, token) => {
+                                    res.status(200).json({
+                                        msg : "successful login(토큰 반환)",
+                                        tokenInfo : "bearer " + token
+                                    });
+                                }
+                            );
                         }
                     })
                     .catch(err => {
