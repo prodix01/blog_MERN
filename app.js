@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const morgan = require("morgan");
 const dotenv = require("dotenv");
+const passport = require("passport");
 
 const userRoutes = require("./routes/users");
 const profileRoutes = require("./routes/profiles");
@@ -15,6 +16,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended : true}));
 
 app.use(morgan("dev"));
+app.use(passport.initialize());  //initialize : 초기화
+
+require("./config/passport")(passport);
 
 
 app.use("/posts", postRoutes);
