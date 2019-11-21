@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const userSchema = mongoose.Schema({
     name : {
         type : String,
-        required : true
+        required : true     //필수값
     },
     email : {
         type : String,
@@ -14,8 +14,7 @@ const userSchema = mongoose.Schema({
         required : true
     },
     avatar : {
-        type : String,
-        required : true
+        type : String
     },
     date : {
         type : String,
