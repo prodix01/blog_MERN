@@ -3,26 +3,34 @@ const router = express.Router();
 
 
 
-// 회원가입
+// @route   POST http://localhost:1234/users/register
+// @desc    register user
+// @access  public
 router.post("/register", (req, res) => {
 
 });
 
 
-// 로그인
+// @route   POST http://localhost:1234/users/login
+// @desc    user login / return jsonwebtoken
+// @access  public
 router.post("/login", (req, res) => {
 
 });
 
 
-//회원탈퇴
-router.delete("/user_id", (req, res) => {
+// @route   POST http://localhost:1234/users/:user_id
+// @desc    delete userInfo
+// @access  private
+router.delete("/:user_id", (req, res) => {
 
 });
 
 
 
-//회원정보 불러오기
+// @route   POST http://localhost:1234/users/
+// @desc    get userInfo
+// @access  private
 router.get("/", (req, res) => {
 
 });
