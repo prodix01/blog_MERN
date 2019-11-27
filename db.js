@@ -4,7 +4,8 @@ mongoose.connect(process.env.MONGO_DB,
         {
             useNewUrlParser : true,
             useUnifiedTopology : true,
-            useCreateIndex : true
+            useCreateIndex : true,
+            useFindAndModify : true
         }
     )
     .then(() => console.log("mongoDB server started"))

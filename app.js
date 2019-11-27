@@ -25,6 +25,16 @@ app.use("/posts", postRoutes);
 app.use("/profiles", profileRoutes);
 app.use("/users", userRoutes);
 
+
+app.use((error, req,res, next ) => {
+   res.status(error.status || 500);
+   res.json({
+       error : {
+           msg : error.message
+       }
+   });
+});
+
 module.exports = app;
 
 

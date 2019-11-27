@@ -5,10 +5,21 @@ const router = express.Router();
 const userModel = require("../models/users");
 const profileModel = require("../models/profiles");
 
+const validateProfileInput = require("../validation/profile");
+
+
 const auth_check = passport.authenticate("jwt", {session : false});
 
 // 프로필 등록
 router.post("/", auth_check, (req, res) => {
+
+    const {errors, isValid} = validateProfileInput(req.body);
+
+    //check Validate
+    if (!isValid) {
+        return res.status(400).json(errors);
+    }
+
     //Get fields
     const profileFields = {};
     profileFields.user = req.user.id;
@@ -28,18 +39,41 @@ router.post("/", auth_check, (req, res) => {
     profileModel
         .findOne({user : req.user.id})
         .then(profile => {
-            new profileModel(profileFields)
-                .save()
-                .then(profile => {
-                    res.status(200).json({
-                        profileInfo : profile
+            if (profile) {
+                profileModel
+                    .findOneAndUpdate(
+                        {user : req.user.id},
+                        {$set : profileFields},
+                        {new : true}
+                    )
+                    .then(profile => {
+                        res.status(200).json({
+                            msg : "Updated profile",
+                            profileInfo : profile
+                        });
+                    })
+                    .catch(err => {
+                        res.status(500).json({
+                            error : err.message
+                        });
                     });
-                })
-                .catch(err => {
-                    res.status(400).json({
-                        error : err.message
+            }
+            else {
+                new profileModel(profileFields)
+                    .save()
+                    .then(profile => {
+                        res.status(200).json({
+                            msg : "registed profile",
+                            profileInfo : profile
+                        });
+                    })
+                    .catch(err => {
+                        res.status(400).json({
+                            error : err.message
+                        });
                     });
-                });
+            }
+
         })
         .catch(err => {
             res.status(500).json({
@@ -53,6 +87,26 @@ router.post("/", auth_check, (req, res) => {
 
 //프로필 불러오기
 router.get("/", auth_check, (req, res) => {
+    profileModel
+        .findOne({user : req.user.id})
+        .then(profile => {
+            if (!profile) {
+                return res.status(400).json({
+                    msg : "There is no profile for this user"
+                });
+            }
+            else {
+                res.status(200).json({
+                    msg : "succesful load profileInfo",
+                    profileInfo : profile
+                });
+            }
+        })
+        .catch(err => {
+            res.status(500).json({
+                error : err.message
+            });
+        });
 
 });
 
@@ -61,7 +115,42 @@ router.get("/", auth_check, (req, res) => {
 //프로필 삭제
 router.delete("/", auth_check, (req, res) => {
 
+    profileModel
+        .remove({user : req.user.id})
+        .then(profile => {
+            res.status(200).json({
+               msg : "successful delete profileInfo"
+            });
+        })
+        .catch(err => {
+            res.status(500).json({
+                error : err.message
+            });
+        });
+
 });
+
+// @route GET profiles/handle/:handle
+// @desc Get profile by handle
+// @ public
+router.get("/handle/:handle", (req, res) => {
+
+    profileModel
+        .findOne({handle : req.params.handle})
+        .then(profile => {
+            if (!profile) {
+                return res.status(400).json({
+                    msg : "There is no profile for this user"
+                });
+            }
+            res.status(200).json({
+                result : true,
+                count : profile.length,
+                profileInfo : profile
+            });
+        });
+});
+
 
 
 module.exports = router;
