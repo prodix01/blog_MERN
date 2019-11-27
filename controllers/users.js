@@ -94,6 +94,7 @@ exports.user_get_login = (req, res) => {
                         }
                         else {
 
+                            const payload = {id: user.id, name: user.name, avatar: user.avatar};
                             // sign token
                             jwt.sign(
                                 payload,
