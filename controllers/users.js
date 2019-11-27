@@ -1,7 +1,7 @@
 const gravatar = require("gravatar");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-
+const validateRagisterInput = require("../validation/register");
 
 const userModel = require("../models/users");
 
@@ -10,14 +10,22 @@ const userModel = require("../models/users");
 // 회원가입
 exports.user_register = (req, res) => {
 
+    const {errors, isValid} = validateRagisterInput(req.body);
+
+    //check validation
+    if (!isValid) {
+        return res.status(400).json(errors)
+    }
     // 이메일 중복여부
     userModel
         .findOne({email : req.body.email})
         .then(user => {
             if (user) {
-                return res.status(400).json({
-                    msg : "email already exitsts"
-                });
+                errors.msg = "email already exists";
+                return res.status(400).json(errors);
+                // return res.status(400).json({
+                //     msg : "email already exists"
+                // });
             }
             const avatar = gravatar.url(req.body.email, {
                 s : '200',  //size
@@ -26,7 +34,7 @@ exports.user_register = (req, res) => {
             });
 
             const newUser = new userModel({
-                name : req.body.userName,
+                name : req.body.name,
                 email : req.body.email,
                 avatar : avatar,
                 password : req.body.password
