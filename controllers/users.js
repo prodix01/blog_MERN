@@ -2,6 +2,7 @@ const gravatar = require("gravatar");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const validateRagisterInput = require("../validation/register");
+const validateLoginInput = require("../validation/login");
 
 const userModel = require("../models/users");
 
@@ -76,13 +77,22 @@ exports.user_register = (req, res) => {
 //로그인
 exports.user_get_login = (req, res) => {
 
+    const {errors, isValid} = validateLoginInput(req.body);
+
+    //check validation
+    if (!isValid) {
+        return res.status(400).json(errors)
+    }
+
     userModel
         .findOne({email : req.body.email})
         .then(user => {
             if (!user) {
-                return res.status(404).json({
-                    msg : "No emailInfo"
-                });
+                errors.msg = "No emailInfo";
+                return res.status(400).json(errors);
+                // return res.status(404).json({
+                //     msg : "No emailInfo"
+                // });
             }
             else {
                 // 패스워드 매칭
@@ -90,9 +100,11 @@ exports.user_get_login = (req, res) => {
                     .compare(req.body.password, user.password)
                     .then(isMatch => {
                         if (!isMatch) {
-                            return res.status(400).json({
-                                msg : "password incorrect"
-                            });
+                            errors.msg = "password incorrect";
+                            return res.status(400).json(errors);
+                            // return res.status(400).json({
+                            //     msg : "password incorrect"
+                            // });
                         }
                         else {
                             //토큰에 들어갈 유저정
