@@ -4,6 +4,8 @@ const passport = require("passport");
 
 const auth_check = passport.authenticate("jwt", {session : false});
 
+const validatePostInput = require("../validation/post");
+
 const postModel = require("../models/posts");
 const profileModel = require("../models/profiles");
 
@@ -11,6 +13,15 @@ const profileModel = require("../models/profiles");
 // @desc Create post
 // @access private
 router.post("/", auth_check, (req, res) => {
+
+
+    const {errors, isValid} = validatePostInput(req.body);
+
+    //check validation
+    if (!isValid) {
+        return res.status(400).json(errors);
+    }
+
     const newPost = new postModel ({
         text : req.body.text,
         name : req.user.name,
@@ -34,6 +45,8 @@ router.post("/", auth_check, (req, res) => {
 // @desc Get post
 // @access public
 router.get("/", (req, res) => {
+
+
     postModel
         .find()
         .then(posts => {
@@ -101,6 +114,42 @@ router.delete("/:post_id", auth_check, (req, res) => {
                 });
         });
 });
+
+
+
+
+
+// @route POST /posts/like/:post_id
+// @desc Like post
+// @access private
+router.post("/like/:post_id", auth_check, (req, res) => {
+    profileModel
+        .findOne({user : req.user.id})
+        .then(profile => {
+            postModel
+                .findById(req.params.post_id)
+                .then(post => {
+                    if (post.likes.filter(like => like.user.toString() === req.user.id).length > 0) {
+                        return res.status(400).json({
+                            msg : "user already liked this post"
+                        });
+                    }
+                    post.likes.unshift({user : req.user.id})
+                    post.save()
+                        .then(post => {
+                            res.status(200).json({
+                                postInfo : post
+                            });
+                        });
+                })
+                .catch(err => {
+                    res.status(404).json({
+                        msg : "No post found"
+                    });
+                });
+        });
+});
+
 
 
 
