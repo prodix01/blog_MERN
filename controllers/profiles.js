@@ -110,17 +110,22 @@ exports.get_profile = (req, res) => {
 exports.delete_profile = (req, res) => {
 
     profileModel
-        .remove({user : req.user.id})
-        .then(profile => {
-            res.status(200).json({
-                msg : "successful delete profileInfo"
-            });
-        })
-        .catch(err => {
-            res.status(500).json({
-                error : err.message
-            });
+        .findByIdAndRemove(req.user.id)
+        .then(() => {
+            userModel
+                .findOneAndRemove({ _id : req.user.id })
+                .then(() => {
+                    res.status(200).json({
+                        msg : "Deleted profile"
+                    });
+                })
+                .catch(err => {
+                    res.status(404).json({
+                        error : err.message
+                    });
+                });
         });
+
 
 };
 
