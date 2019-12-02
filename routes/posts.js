@@ -153,4 +153,42 @@ router.post("/like/:post_id", auth_check, (req, res) => {
 
 
 
+// @route POST /posts/unlike/:post_id
+// @desc UnLike post
+// @access private
+router.post("/unlike/:post_id", auth_check, (req, res) => {
+    profileModel
+        .findOne({user : req.user.id})
+        .then(profile => {
+            postModel
+                .findById(req.params.post_id)
+                .then(post => {
+                    if (post.likes.filter(like => like.user.toString() === req.user.id).length === 0) {
+                        return res.status(400).json({
+                            msg : "You have not liked this post"
+                        });
+                    }
+                    const removeIndex = post.likes
+                        .map(item => item.user.toString())
+                        .indexOf(req.user.id);
+
+                    post.likes.splice(removeIndex, 1);
+
+                    //save
+                    post.save()
+                        .then(post => {
+                            res.status(200).json(post);
+
+                        });
+                })
+                .catch(err => {
+                    res.status(400).json({
+                        msg : "No post found"
+                    });
+                });
+        })
+});
+
+
+
 module.exports = router;
