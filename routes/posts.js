@@ -72,6 +72,38 @@ router.get("/", (req, res) => {
 
 
 
+
+
+// @route POST /posts/
+// @desc update post
+// @access private
+router.post("/", auth_check, (req, res) => {
+
+    const postFields = {};
+    postFields.user = req.user.id;
+    if (req.body.text) postFields.text = req.body.text;
+
+    postModel
+        .findOne({user : req.user.id})
+        .then(post => {
+            postModel
+                .findOneAndUpdate(
+                    {user : req.user.id},
+                    {$set : postFields},
+                    {new : true}
+                )
+                .then(post => {
+                    res.status(200).json({
+                        msg : "update postInfo",
+                        postInfo : post
+                    });
+                });
+        });
+
+});
+
+
+
 // @route GET /posts/:post_id
 // @desc Detail Get post
 // @access private
