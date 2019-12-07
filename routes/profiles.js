@@ -2,14 +2,7 @@ const express = require("express");
 const passport = require("passport");
 const router = express.Router();
 
-const userModel = require("../models/users");
-const profileModel = require("../models/profiles");
-
-const validateExpInput = require("../validation/experience");
-const validateEduInput = require("../validation/education");
 const profileController = require("../controllers/profiles");
-
-
 
 const auth_check = passport.authenticate("jwt", {session : false});
 

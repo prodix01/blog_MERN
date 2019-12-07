@@ -205,3 +205,68 @@ exports.unlike_post = (req, res) => {
                 });
         })
 };
+
+
+
+
+//add comment to post
+exports.post_comment = (req, res) => {
+    const {errors, isValid} = validatePostInput(req.body);
+
+    //check validation
+    if (!isValid) {
+        return res.status(400).json(errors);
+    }
+    postModel
+        .findById(req.params.post_id)
+        .then(post => {
+            const newComment = {
+                text : req.body.text,
+                name : req.user.name,
+                avatar : req.user.avatar,
+                user : req.user.id
+            };
+
+            //add to comments array
+            post.comments.unshift(newComment);
+
+            //save
+            post
+                .save()
+                .then(post => {
+                    res.status(200).json(post);
+                });
+        })
+        .catch(err => {
+            res.status(404).json({
+                msg : "Post not found"
+            });
+        });
+};
+
+
+
+//delete comment to post
+exports.delete_comment = (req, res) => {
+    postModel
+        .findById(req.params.post_id)
+        .then(post => {
+            if (post.comments.filter(comment => comment._id.toString() === req.params.comment_id).length === 0) {
+                return res.status(404).json({
+                    msg : "Comment does not exist"
+                });
+            }
+            //get remove index
+            const removeIndex = post.comments
+                .map(item => item._id.toString())
+                .indexOf(req.params.comment_id);
+
+            //splice comment out of array
+            post.comments.splice(removeIndex, 1);
+            post
+                .save()
+                .then(post => {
+                    res.status(200).json(post);
+                });
+        });
+};
