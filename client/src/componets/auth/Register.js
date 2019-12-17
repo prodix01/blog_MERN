@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import axios from "axios";
 
 
 
@@ -36,7 +37,11 @@ class Register extends Component {
             password2: this.state.password2
         };
 
-        console.log(newUser);
+        // console.log(newUser);
+        axios
+            .post("/users/register", newUser)
+            .then(res => console.log(res.data))
+            .catch(err => this.setState({ errors : err.response.data }));
 
     }
 
