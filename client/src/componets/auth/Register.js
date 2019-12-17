@@ -60,7 +60,7 @@ class Register extends Component {
                                         className="form-control form-control-lg"
                                         placeholder="Name"
                                         name="name"
-                                        value={this.state.name}
+                                        value={name}
                                         onChange={this.onChange}
                                     />
                                 </div>
