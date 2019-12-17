@@ -7,20 +7,24 @@ const passport = require("passport");
 
 
 const userModel = require("../models/users");
-const userController = require("../controllers/users");
+const {
+    user_register,
+    user_get_all,
+    user_get_login
+} = require("../controllers/users");
 
 const auth_check = passport.authenticate("jwt", {session : false});
 
 // @route   POST http://localhost:1234/users/register
 // @desc    register user
 // @access  public
-router.post("/register", userController.user_register);
+router.post("/register", user_register);
 
 
 // @route   POST http://localhost:1234/users/login
 // @desc    user login / return jsonwebtoken
 // @access  public
-router.post("/login", userController.user_get_login);
+router.post("/login", user_get_login);
 
 
 // @route   DELETE http://localhost:1234/users/:user_id
@@ -35,7 +39,7 @@ router.delete("/:user_id", (req, res) => {
 // @route   GET http://localhost:1234/users/
 // @desc    get userInfo
 // @access  private
-router.get("/", auth_check, userController.user_get_all);
+router.get("/", auth_check, user_get_all);
 
 
 
