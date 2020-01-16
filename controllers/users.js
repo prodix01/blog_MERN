@@ -95,7 +95,7 @@ exports.user_get_login = (req, res) => {
                                 (err, token) => {
                                     res.status(200).json({
                                         msg : "successful login(토큰 반환)",
-                                        tokenInfo : "bearer " + token
+                                        token : "bearer " + token
                                     });
                                 }
                             );
