@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const validateRagisterInput = require("../validation/register");
+const validateRegisterInput = require("../validation/register");
 const validateLoginInput = require("../validation/login");
 
 const userModel = require("../models/users");
@@ -10,7 +10,7 @@ const userModel = require("../models/users");
 // 회원가입
 exports.user_register = (req, res) => {
 
-    const {errors, isValid} = validateRagisterInput(req.body);
+    const {errors, isValid} = validateRegisterInput(req.body);
 
     //check validation
     if (!isValid) {
@@ -44,6 +44,38 @@ exports.user_register = (req, res) => {
                 });
 
         });
+    //
+    // const { errors, isValid } = validateRegisterInput(req.body);
+    // const { name, email, password } = req.body;
+    //
+    // // Check Validation
+    // if (!isValid) {
+    //     return res.status(400).json(errors);
+    // }
+    //
+    // userModel
+    //     .findOne({ email })
+    //     .exec()
+    //     .then(user => {
+    //         if (user) {
+    //             errors.email = 'Email already exists';
+    //             return res.status(400).json(errors);
+    //         }
+    //         const newUser = new userModel({
+    //             name, email, password
+    //         });
+    //         newUser
+    //             .save()
+    //             .then(user => {
+    //                 res.status(200).json({
+    //                     msg: "Successful newuser",
+    //                     userInfo: user
+    //                 });
+    //             })
+    //             .catch(err => console.log(err));
+    //
+    //
+    //     });
 
 };
 
@@ -86,7 +118,7 @@ exports.user_get_login = (req, res) => {
                         }
                         else {
 
-                            const payload = {id: user.id, name: user.name, avatar: user.avatar};
+                            const payload = {id: user._id, name: user.name, avatar: user.avatar};
                             // sign token
                             jwt.sign(
                                 payload,

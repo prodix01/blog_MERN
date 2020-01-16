@@ -5,6 +5,7 @@ import PropTypes from "prop-types";
 import {connect} from "react-redux";
 import {registerUser} from "../../actions/authActions";
 import {withRouter} from "react-router-dom";
+import axios from "axios";
 
 
 class Register extends Component {
@@ -29,7 +30,7 @@ class Register extends Component {
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.errors) {
-            this.setState({ error: nextProps.errors});
+            this.setState({ errors: nextProps.errors });
         }
     }
 
@@ -47,7 +48,12 @@ class Register extends Component {
             password2: this.state.password2
         };
 
-        this.props.registerUser(newUser, this.props.history);
+        // this.props.registerUser(newUser, this.props.history);
+
+        axios
+            .post("/users/register", newUser)
+            .then(res => console.log(res.data))
+            .catch(err => this.setState({ errors : err.response.data }));
 
     }
 
@@ -104,7 +110,7 @@ class Register extends Component {
                                 <div className="form-group">
                                     <input
                                         type="password"
-                                        className={classnames("form-control form-control-lg", {
+                                        className={classnames('form-control form-control-lg', {
                                             "is-invalid" : errors.password
                                         })}
                                         placeholder="Password"
@@ -119,10 +125,10 @@ class Register extends Component {
                                 <div className="form-group">
                                     <input
                                         type="password"
-                                        className={classnames("form-control form-control-lg", {
+                                        className={classnames('form-control form-control-lg', {
                                             "is-invalid" : errors.password2
                                         })}
-                                        placeholder="Comfirm password"
+                                        placeholder="Confirm password"
                                         name="password2"
                                         value={password2}
                                         onChange={this.onChange}
@@ -143,6 +149,7 @@ class Register extends Component {
 
 
 Register.propTypes = {
+    registerUser: PropTypes.func.isRequired,
     errors: PropTypes.object.isRequired,
     auth: PropTypes.object.isRequired
 };

@@ -2,7 +2,10 @@ import React, {Component} from 'react';
 import classnames from "classnames";
 import PropTypes from "prop-types";
 import {connect} from "react-redux";
-import {loginUser} from "../../actions/authActions";
+import {loginUser, registerUser, setCurrentUser} from "../../actions/authActions";
+import axios from "axios";
+import setAuthToken from "../../utils/setAuthToken";
+import jwt_decode from "jwt-decode";
 
 
 class Login extends Component {
@@ -13,8 +16,8 @@ class Login extends Component {
     constructor() {
         super();
         this.state = {
-            email: "",
-            password: "",
+            email: '',
+            password: '',
             errors: {}
         };
 
@@ -22,47 +25,75 @@ class Login extends Component {
         this.onSubmit = this.onSubmit.bind(this);
     }
 
-    onChange (e) {
-        this.setState({ [e.target.name] : e.target.value})
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.auth.isAuthenticated) {
+            this.props.history.push('/dashboard');
+        }
+
+        if (nextProps.errors) {
+            this.setState({ errors: nextProps.errors });
+        }
     }
-    onSubmit (e) {
+
+    componentDidMount() {
+        if (this.props.auth.isAuthenticated) {
+            this.props.history.push("/dashboard");
+        }
+    }
+
+
+    onSubmit(e) {
         e.preventDefault();
 
-        const loginUser = {
-            email : this.state.email,
-            password : this.state.password
+        const userData = {
+            email: this.state.email,
+            password: this.state.password
         };
 
-        this.props.loginUser(loginUser);
-        // console.log(loginUser);
-        // axios
-        //     .post("/users/login", loginUser)
-        //     .then(res => console.log(res.data))
-        //     .catch(err => this.setState({ errors : err.response.data }));
+        // this.props.loginUser(userData);
+        axios
+            .post("/users/login", userData)
+            .then(res => {
+                // Save to localStorage
+                const { token } = res.data;
+                // Set token to ls
+                localStorage.setItem('jwtToken', token);
+                // Set token to Auth header
+                setAuthToken(token);
+                // Decode token to get user data
+                const decoded = jwt_decode(token);
+                // Set current user
+                (setCurrentUser(decoded));
+                this.props.history.push('/dashboard');
+            })
+            .catch(err => this.setState({ errors : err.response.data }));
+    }
 
-
-
+    onChange(e) {
+        this.setState({ [e.target.name]: e.target.value });
     }
 
     render() {
-        const {email,password,errors} = this.state;
+        const {errors} = this.state;
         return (
             <div className="login">
                 <div className="container">
                     <div className="row">
                         <div className="col-md-8 m-auto">
-                            <h1 className="display-4 text-center">Login</h1>
-                            <p className="lead text-center">Sign in to your DevConnector account</p>
+                            <h1 className="display-4 text-center">Log In</h1>
+                            <p className="lead text-center">
+                                Sign in to your DevConnector account
+                            </p>
                             <form onSubmit={this.onSubmit}>
                                 <div className="form-group">
                                     <input
                                         type="email"
-                                        className={classnames("form-control form-control-lg", {
-                                            "is-invalid" : errors.email
+                                        className={classnames('form-control form-control-lg', {
+                                            'is-invalid': errors.email
                                         })}
                                         placeholder="Email Address"
                                         name="email"
-                                        value={email}
+                                        value={this.state.email}
                                         onChange={this.onChange}
                                     />
                                     {errors.email && (
@@ -72,19 +103,19 @@ class Login extends Component {
                                 <div className="form-group">
                                     <input
                                         type="password"
-                                        className={classnames("form-control form-control-lg", {
-                                            "is-invalid" : errors.password
+                                        className={classnames('form-control form-control-lg', {
+                                            'is-invalid': errors.password
                                         })}
-                                        placeholder="password"
+                                        placeholder="Password"
                                         name="password"
-                                        value={password}
+                                        value={this.state.password}
                                         onChange={this.onChange}
                                     />
                                     {errors.password && (
                                         <div className="invalid-feedback">{errors.password}</div>
                                     )}
                                 </div>
-                                <input type="submit" className="btn btn-info btn-block mt-4"/>
+                                <input type="submit" className="btn btn-info btn-block mt-4" />
                             </form>
                         </div>
                     </div>
@@ -107,4 +138,4 @@ const mapStateToProps = state => ({
 });
 
 
-export default connect(mapStateToProps, {loginUser}) (Login);
+export default connect(mapStateToProps, {loginUser})(Login);
