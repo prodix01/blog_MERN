@@ -29,9 +29,13 @@ exports.user_register = (req, res) => {
             }
 
             const newUser = new userModel({
-                name : req.body.name,
-                email : req.body.email,
-                password : req.body.password
+                method: "local",
+                local: {
+                    name : req.body.name,
+                    email : req.body.email,
+                    password : req.body.password
+                }
+
             });
 
             newUser
@@ -95,7 +99,7 @@ exports.user_get_login = (req, res) => {
     }
 
     userModel
-        .findOne({email : req.body.email})
+        .findOne({"local.email" : req.body.email})
         .then(user => {
             if (!user) {
                 errors.msg = "No emailInfo";
@@ -107,7 +111,7 @@ exports.user_get_login = (req, res) => {
             else {
                 // 패스워드 매칭
                 bcrypt
-                    .compare(req.body.password, user.password)
+                    .compare(req.body.password, user.local.password)
                     .then(isMatch => {
                         if (!isMatch) {
                             errors.msg = "password incorrect";

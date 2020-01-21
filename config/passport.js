@@ -2,6 +2,7 @@
 
 const JwtStrategy = require("passport-jwt").Strategy;  //  Strategy : jwt 검사
 const ExtractJwt = require("passport-jwt").ExtractJwt; // jwt 풀어주기
+const FacebookTokenStrategy = require("passport-facebook-token");
 const userModel = require("../models/users");
 
 const opts = {};
@@ -26,4 +27,39 @@ module.exports = passport => {
                 });
         })
     );
+
+
+
+    //
+    passport.use("facebookToken", new FacebookTokenStrategy({
+        clientID: process.env.FACEBOOK_CLIENTID,
+        clientSecret: process.env.FACEBOOK_SECRET,
+
+    }, async (accessToken, refreshToken, profile, cb) => {
+        // console.log("profile", profile);
+        // console.log("accessToken", accessToken);
+        // console.log("refreshToken", refreshToken);
+        try {
+            const existingUser = await userModel.findOne({"facebook.id" : profile.id });
+            if (existingUser) {
+                return cb(null, existingUser);
+            }
+            const newUser = new userModel({
+                method: "facebook",
+                facebook: {
+                    id: profile.id,
+                    name: profile.displayName,
+                    email: profile.emails[0].value,
+                    avatar: profile.photos[0].value
+                }
+            });
+            await newUser.save();
+            cb(null, newUser);
+
+        }
+        catch (error) {
+            cb(error, false, error.message)
+        }
+    }))
+
 };

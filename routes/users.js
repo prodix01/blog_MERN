@@ -14,6 +14,7 @@ const {
 } = require("../controllers/users");
 
 const auth_check = passport.authenticate("jwt", {session : false});
+const facebook_auth = passport.authenticate("facebookToken", {session: false});
 
 // @route   POST http://localhost:1234/users/register
 // @desc    register user
@@ -25,6 +26,28 @@ router.post("/register", user_register);
 // @desc    user login / return jsonwebtoken
 // @access  public
 router.post("/login", user_get_login);
+
+
+// @route POST http://localhost:1234/users/facebook
+// @desc user facebook login jsonwebtoken
+// @access public
+router.post("/facebook", facebook_auth, (req, res) => {
+
+    console.log(req.user);
+    const payload = {id: req.user._id, name: req.user.name, avatar: req.user.avatar};
+
+    jwt.sign(
+        payload,
+        process.env.JWT_SECRET,
+        { expiresIn : 36000 }, //만료시간
+        (err, token) => {
+            res.status(200).json({
+                msg : "successful login(토큰 반환)",
+                token : "bearer " + token
+            });
+        }
+    );
+});
 
 
 // @route   DELETE http://localhost:1234/users/:user_id
