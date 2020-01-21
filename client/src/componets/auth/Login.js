@@ -2,10 +2,11 @@ import React, {Component} from 'react';
 import classnames from "classnames";
 import PropTypes from "prop-types";
 import {connect} from "react-redux";
-import {loginUser, registerUser, setCurrentUser} from "../../actions/authActions";
+import {loginUser, setCurrentUser, facebookLogin} from "../../actions/authActions";
 import axios from "axios";
 import setAuthToken from "../../utils/setAuthToken";
 import jwt_decode from "jwt-decode";
+import FacebookLogin from "react-facebook-login";
 
 
 class Login extends Component {
@@ -23,6 +24,7 @@ class Login extends Component {
 
         this.onChange = this.onChange.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
+        this.responseFacebook = this.responseFacebook.bind(this);
     }
 
     componentWillReceiveProps(nextProps) {
@@ -73,6 +75,13 @@ class Login extends Component {
         this.setState({ [e.target.name]: e.target.value });
     }
 
+    responseFacebook(res) {
+        console.log("facebookLogin", res);
+        this.props.facebookLogin(res.accessToken);
+        if (!this.props.errorMessage) {
+            this.props.history.push("/dashboard")
+        }
+    }
     render() {
         const {errors} = this.state;
         return (
@@ -117,6 +126,15 @@ class Login extends Component {
                                 </div>
                                 <input type="submit" className="btn btn-info btn-block mt-4" />
                             </form>
+                            <div>
+                                <FacebookLogin
+                                    appId="3469341533092807"
+                                    textButton="facebook"
+                                    fields="name,email,picture"
+                                    callback={this.responseFacebook}
+                                    cssClass="btn btn-outline-primary"
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -129,7 +147,8 @@ class Login extends Component {
 Login.propTypes = {
     loginUser: PropTypes.func.isRequired,
     auth: PropTypes.object.isRequired,
-    errors: PropTypes.object.isRequired
+    errors: PropTypes.object.isRequired,
+    responseFacebook: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -138,4 +157,4 @@ const mapStateToProps = state => ({
 });
 
 
-export default connect(mapStateToProps, {loginUser})(Login);
+export default connect(mapStateToProps, {loginUser, facebookLogin})(Login);
