@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import axios from "axios";
+import Moment from "react-moment";
 
 class Dashboard extends Component {
 
@@ -34,7 +35,7 @@ class Dashboard extends Component {
                         <th scope="col">#</th>
                         <th scope="col">Title</th>
                         <th scope="col">Name</th>
-                        <th scope="col">Handle</th>
+                        <th scope="col">Date</th>
                     </tr>
                     </thead>
                     {posts.map(post =>
@@ -44,7 +45,11 @@ class Dashboard extends Component {
                         <th scope="row"></th>
                         <td>{post.text}</td>
                         <td>{post.name}</td>
-                        <td>@mdo</td>
+                        <td>
+                            <Moment format="YYYY년 MM월 DD일">
+                                {post.date}
+                            </Moment>
+                        </td>
                     </tr>
 
                     </tbody>

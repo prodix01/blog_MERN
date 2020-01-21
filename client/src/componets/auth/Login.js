@@ -50,7 +50,7 @@ class Login extends Component {
             password: this.state.password
         };
 
-        // this.props.loginUser(userData);
+        this.props.loginUser(userData);
         axios
             .post("/users/login", userData)
             .then(res => {
