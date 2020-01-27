@@ -7,7 +7,7 @@ const userModel = require("../models/users");
 
 const opts = {};
 opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
-opts.secretOrKey = process.env.JWT_SECRET;
+opts.secretOrKey = process.env.JWT_SECRET || "kim";
 
 module.exports = passport => {
     passport.use(
@@ -32,8 +32,8 @@ module.exports = passport => {
 
     //
     passport.use("facebookToken", new FacebookTokenStrategy({
-        clientID: process.env.FACEBOOK_CLIENTID,
-        clientSecret: process.env.FACEBOOK_SECRET,
+        clientID: process.env.FACEBOOK_CLIENTID || "3469341533092807",
+        clientSecret: process.env.FACEBOOK_SECRET || "800ff990b22a51b728de8f1d9960a69b",
 
     }, async (accessToken, refreshToken, profile, cb) => {
         // console.log("profile", profile);

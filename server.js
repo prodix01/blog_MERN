@@ -5,6 +5,6 @@ require("./db");
 
 
 const server = http.createServer(app);
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || "1234";
 
 server.listen(PORT, console.log(`server started at http://localhost:${PORT}`));

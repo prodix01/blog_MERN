@@ -126,7 +126,7 @@ exports.user_get_login = (req, res) => {
                             // sign token
                             jwt.sign(
                                 payload,
-                                process.env.JWT_SECRET,
+                                process.env.JWT_SECRET || "kim",
                                 { expiresIn : 36000 }, //만료시간
                                 (err, token) => {
                                     res.status(200).json({
