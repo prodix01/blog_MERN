@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 
 const bodyParser = require("body-parser");
 const morgan = require("morgan");
@@ -39,6 +40,19 @@ app.use((error, req,res, next ) => {
        }
    });
 });
+
+
+if (process.env.NODE_ENV === "production") {
+    app.use(express.static("client/build"));
+
+    app.get("*", (req, res) => {
+        res.sendfile(path.join(__dirname, "clent", "build", "index.html"))
+    })
+};
+
+
+
+
 
 module.exports = app;
 
