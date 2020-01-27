@@ -7,6 +7,8 @@ import axios from "axios";
 import setAuthToken from "../../utils/setAuthToken";
 import jwt_decode from "jwt-decode";
 import FacebookLogin from "react-facebook-login";
+import GoogleLogin from "react-google-login";
+
 
 
 class Login extends Component {
@@ -82,6 +84,15 @@ class Login extends Component {
             this.props.history.push("/dashboard")
         }
     }
+
+    responseGoogle(res) {
+        console.log("GoogleLogin", res);
+        // this.props.facebookLogin(res.accessToken);
+        // if (!this.props.errorMessage) {
+        //     this.props.history.push("/dashboard")
+        // }
+    }
+
     render() {
         const {errors} = this.state;
         return (
@@ -133,6 +144,12 @@ class Login extends Component {
                                     fields="name,email,picture"
                                     callback={this.responseFacebook}
                                     cssClass="btn btn-outline-primary"
+                                />
+                                <GoogleLogin
+                                    onSuccess={result => console.log(result)}
+                                    onFailure={result => console.log(result)}
+                                    clientId="328850759539-ilottqpnk6tbbv3oh8le32f6ldafqfk0.apps.googleusercontent.com"
+                                    cookiePolicy={"single_host_origin"}
                                 />
                             </div>
                         </div>
